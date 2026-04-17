@@ -69,6 +69,10 @@ async function fetchCraftFlips(player, profile) {
                 profit: Math.round(profit * 100) / 100,
                 marginPct: Math.round(marginPct * 10) / 10,
                 volume: Math.floor(item.volume || 0),
+                requirements: (item.requirements || []).map(req => ({
+                    name: req.name || "Unknown",
+                    level: req.level || 0
+                })),
                 ingredients: (item.ingredients || []).map(ing => ({
                     name: cleanMinecraftText((ing.itemId || "Unknown").replace(/_/g, ' ')),
                     count: ing.count || 0

@@ -398,9 +398,18 @@
                 <tr class="table-row fade-in">
                     <td class="px-4 py-3 text-zinc-600 mono text-xs">${i+1}</td>
                     <td class="px-4 py-3 text-emerald-300 font-medium">
-                        <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
-                            ${f.name}
-                        </a>
+                        <div class="flex flex-col">
+                            <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
+                                ${f.name}
+                            </a>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                ${(f.requirements && f.requirements.length > 0) ? f.requirements.map(req => `
+                                    <span class="px-1.5 py-0.5 rounded-sm bg-zinc-800 text-[10px] text-zinc-400 border border-zinc-700 font-bold uppercase tracking-tight">
+                                        ${req.name} ${req.level}
+                                    </span>
+                                `).join('') : ''}
+                            </div>
+                        </div>
                     </td>
                     <td class="px-4 py-3 text-right mono text-zinc-400">${fmtPrice(f.sellPrice)}</td>
                     <td class="px-4 py-3 text-right mono text-zinc-400">${fmtPrice(f.craftCost)}</td>
