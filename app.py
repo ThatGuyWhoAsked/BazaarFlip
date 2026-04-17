@@ -23,7 +23,7 @@ def clean_minecraft_text(text):
 def fetch_coflnet_bazaar_flips():
     """Fetch bazaar spread flips from Coflnet."""
     try:
-        response = requests.get(COFLNET_BZ_SPREAD_URL, timeout=15)
+        response = requests.get(COFLNET_BZ_SPREAD_URL, timeout=8)
         response.raise_for_status()
         data = response.json()
         
@@ -64,7 +64,7 @@ def fetch_coflnet_craft_flips(player=None, profile=None):
     if player: params["player"] = player
     if profile: params["profile"] = profile
     try:
-        response = requests.get(COFLNET_CRAFT_URL, params=params, timeout=15)
+        response = requests.get(COFLNET_CRAFT_URL, params=params, timeout=8)
         response.raise_for_status()
         data = response.json()
         normalized_flips = []
