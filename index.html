@@ -278,8 +278,11 @@
                         <tbody id="craft-table-body" class="divide-y divide-white/5"></tbody>
                     </table>
                 </div>
-            </div>
-        </div>
+                <!-- Craft Instructions Modal -->
+                <div id="craft-modal" class="hidden fixed inset-0 z-50" onclick="closeCraftModal()">
+                    <div class="absolute inset-0 bg-black/80"></div>
+                    <div id="craft-modal-content" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-zinc-800 border border-zinc-600 rounded-xl p-6 text-zinc-300 whitespace-pre-line max-w-2xl max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()"></div>
+                </div>
 
         <!-- KAT Section -->
         <div id="kat-section" class="hidden">
@@ -382,7 +385,15 @@
         }
 
         async function showInstructions(productId, btn) {
-            window.open(`${COFLNET_API}/craft/${productId}/instructions`, '_blank');
+            const data = await fetchInstructions(productId);
+            if (data) {
+                document.getElementById('craft-modal-content').textContent = formatInstructions(data);
+                document.getElementById('craft-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeCraftModal() {
+            document.getElementById('craft-modal').classList.add('hidden');
         }
 
         function saveFilters() {
