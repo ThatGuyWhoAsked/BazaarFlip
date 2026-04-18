@@ -4,10 +4,11 @@ This project provides a real-time web application and CLI tool for identifying p
 
 ## 🏗️ Architecture & APIs
 
-- **Web Application (`app.py`)**: Uses the **Coflnet API** (`sky.coflnet.com`).
+- **Web Application**: Uses **Coflnet API** (`sky.coflnet.com`) served via **Netlify Functions** (`netlify/functions/api.js`).
   - **Bazaar Spread API**: `https://sky.coflnet.com/api/flip/bazaar/spread`
   - **Craft Profit API**: `https://sky.coflnet.com/api/craft/profit`
   - **Note**: Coflnet's naming convention in the JSON response is often "flipped" compared to standard terminology: `sellPrice` is usually the buy cost (entry), and `buyPrice` is the target sell price (exit).
+  - **Requirements**: Crafting requirements (Collection/Slayer) are extracted from `reqCollection` and `reqSlayer` fields in the Craft API response.
 - **CLI Tool (`main.py`)**: Uses the **Official Hypixel API** (`api.hypixel.net`).
   - Requires `HYPIXEL_API_KEY` environment variable.
   - Implements its own logic for calculating flips based on `quick_status`.
