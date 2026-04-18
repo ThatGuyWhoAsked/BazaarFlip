@@ -410,16 +410,77 @@
             setTimeout(() => el.textContent = old, 2000);
         }
 
+        const COFLNET_API = "https://sky.coflnet.com/api";
+
         async function fetchFlips() {
             try {
                 const u = document.getElementById('username').value, p = document.getElementById('profile').value;
-                const res = await fetch(`/api/flips?player=${encodeURIComponent(u)}&profile=${encodeURIComponent(p)}`);
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || "API error");
                 
-                currentFlips = data.flips || [];
-                currentCraftFlips = data.craftFlips || [];
-                currentKatFlips = data.katFlips || [];
+                const [bzRes, craftRes, katRes] = await Promise.all([
+                    fetch(`${COFLNET_API}/flip/bazaar/spread`, { timeout: 10000 }),
+                    fetch(`${COFLNET_API}/craft/profit?player=${encodeURIComponent(u)}&profile=${encodeURIComponent(p)}`, { timeout: 10000 }),
+                    fetch(`${COFLNET_API}/kat/profit`, { timeout: 10000 })
+                ]);
+                
+                const TAX_RATE = 0.0125;
+                
+                const bzData = await bzRes.json();
+                currentFlips = bzData.map(item => {
+                    const f = item.flip || {};
+                    const buyAt = f.sellPrice || 0;
+                    const sellAt = f.buyPrice || 0;
+                    if (buyAt <= 0 || sellAt <= 0) return null;
+                    const revenue = sellAt * (1 - TAX_RATE);
+                    const profitPer = revenue - buyAt;
+                    const marginPct = buyAt > 0 ? (profitPer / buyAt * 100) : 0;
+                    return {
+                        productId: f.itemTag,
+                        name: item.itemName || f.itemTag || "Unknown",
+                        buyAt: Math.round(buyAt * 100) / 100,
+                        sellAt: Math.round(sellAt * 100) / 100,
+                        marginPct: Math.round(marginPct * 10) / 10,
+                        profitPotential: Math.round(profitPer * (f.volume || 0)),
+                        profitPerHour: Math.round((f.profitPerHour || 0) * 100) / 100,
+                        weeklyVolume: Math.floor(f.volume || 0),
+                        isManipulated: item.isManipulated || false
+                    };
+                }).filter(f => f !== null);
+                
+                const craftData = await craftRes.json();
+                currentCraftFlips = craftData.map(item => {
+                    const sellPrice = item.sellPrice || 0;
+                    const craftCost = item.craftCost || 0;
+                    const profit = sellPrice - craftCost;
+                    const marginPct = craftCost > 0 ? (profit / craftCost * 100) : 0;
+                    const requirements = [];
+                    if (item.reqCollection) requirements.push({ name: item.reqCollection.name || "Unknown", level: item.reqCollection.level || 0 });
+                    if (item.reqSlayer) requirements.push({ name: item.reqSlayer.name || "Unknown", level: item.reqSlayer.level || 0 });
+                    return {
+                        productId: item.itemId,
+                        name: item.itemName || item.itemId || "Unknown",
+                        sellPrice: Math.round(sellPrice * 100) / 100,
+                        craftCost: Math.round(craftCost * 100) / 100,
+                        profit: Math.round(profit * 100) / 100,
+                        marginPct: Math.round(marginPct * 10) / 10,
+                        volume: Math.floor(item.volume || 0),
+                        requirements: requirements,
+                        ingredients: (item.ingredients || []).map(ing => ({ name: (ing.itemId || "Unknown").replace(/_/g, ' '), count: ing.count || 0 }))
+                    };
+                }).sort((a, b) => b.profit - a.profit);
+                
+                const katData = await katRes.json();
+                currentKatFlips = katData.map(item => ({
+                    productId: item.productId || `PET_${(item.name || "").toUpperCase().replace(/ /g, '_')}`,
+                    name: item.name || item.coreData?.name || "Unknown Pet",
+                    fromRarity: item.coreData?.baseRarity || item.fromRarity || "UNKNOWN",
+                    toRarity: item.targetRarity || "UNKNOWN",
+                    purchaseCost: Math.round(item.purchaseCost || 0),
+                    materialCost: Math.round(item.materialCost || 0),
+                    median: Math.round(item.median || 0),
+                    profit: Math.round(item.profit || 0),
+                    volume: Math.floor(item.volume || 0)
+                }));
+                
                 document.getElementById('total-items').textContent = currentFlips.length;
                 document.getElementById('flips-count').textContent = currentCraftFlips.length;
                 
