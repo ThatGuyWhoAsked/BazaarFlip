@@ -113,6 +113,7 @@ async function fetchKatFlips() {
         const data = await res.json();
 
         const katFlips = data.map(item => ({
+            productId: item.productId || `PET_${item.name?.toUpperCase().replace(/ /g, '_')}`,
             name: item.name || item.coreData?.name || "Unknown Pet",
             fromRarity: item.coreData?.baseRarity || item.fromRarity || "UNKNOWN",
             toRarity: item.targetRarity || "UNKNOWN",
