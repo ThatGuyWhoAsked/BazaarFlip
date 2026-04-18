@@ -228,14 +228,14 @@
                     <table class="w-full text-sm">
                         <thead class="bg-white/5 text-zinc-400 text-xs">
                             <tr>
-                                <th class="px-4 py-4 text-left font-semibold">#</th>
-                                <th class="px-4 py-4 text-left font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('name')">Item</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('buyAt')">Buy At</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('sellAt')">Sell At</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('marginPct')">Margin</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('profitPerHour')">Profit/Hr</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('profitPotential')">Est. Profit</th>
-                                <th class="px-4 py-4 text-center font-semibold">Status</th>
+                                <th class="px-3 py-3 text-left font-semibold">#</th>
+                                <th class="px-3 py-3 text-left font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('name')">Item</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('buyAt')">Buy At</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('sellAt')">Sell At</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('marginPct')">Margin</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('profitPerHour')">Profit/Hr</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setBazaarSort('profitPotential')">Est. Profit</th>
+                                <th class="px-3 py-3 text-center font-semibold">Status</th>
                             </tr>
                         </thead>
                         <tbody id="table-body" class="divide-y divide-white/5"></tbody>
@@ -264,14 +264,15 @@
                     <table class="w-full text-sm">
                         <thead class="bg-white/5 text-zinc-400 text-xs">
                             <tr>
-                                <th class="px-4 py-4 text-left font-semibold">#</th>
-                                <th class="px-4 py-4 text-left font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('name')">Item</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('sellPrice')">Sell Price</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('craftCost')">Craft Cost</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('profit')">Profit</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('marginPct')">Margin</th>
-                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('volume')">Volume</th>
-                                <th class="px-4 py-4 text-center font-semibold">Ingredients</th>
+                                <th class="px-3 py-3 text-left font-semibold">#</th>
+                                <th class="px-3 py-3 text-left font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('name')">Item</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('sellPrice')">Sell Price</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('craftCost')">Craft Cost</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('profit')">Profit</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('marginPct')">Margin</th>
+                                <th class="px-3 py-3 text-right font-semibold cursor-pointer hover:text-white" onclick="setCraftSort('volume')">Volume</th>
+                                <th class="px-3 py-3 text-center font-semibold">Ingredients</th>
+                                <th class="px-3 py-3 text-center font-semibold">Instructions</th>
                             </tr>
                         </thead>
                         <tbody id="craft-table-body" class="divide-y divide-white/5"></tbody>
@@ -448,18 +449,18 @@
             
             document.getElementById('table-body').innerHTML = filtered.slice(0, limit).map((f, i) => `
                 <tr class="table-row fade-in">
-                    <td class="px-4 py-3 text-zinc-600 mono text-xs">${i+1}</td>
-                    <td class="px-4 py-3 text-emerald-300 font-medium">
+                    <td class="px-3 py-3 text-zinc-600 mono text-xs">${i+1}</td>
+                    <td class="px-3 py-3 text-emerald-300 font-medium">
                         <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
                             ${f.name}
                         </a>
                     </td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmtPrice(f.buyAt)}</td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmtPrice(f.sellAt)}</td>
-                    <td class="px-4 py-3 text-right"><span class="px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 text-xs font-semibold mono">${f.marginPct}%</span></td>
-                    <td class="px-4 py-3 text-right mono text-blue-400">${fmt(f.profitPerHour)}</td>
-                    <td class="px-4 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profitPotential)}</td>
-                    <td class="px-4 py-3 text-center">${f.isManipulated ? '<span class="text-red-400 text-xs">⚠️</span>' : '<span class="text-green-400 text-xs">✅</span>'}</td>
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmtPrice(f.buyAt)}</td>
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmtPrice(f.sellAt)}</td>
+                    <td class="px-3 py-3 text-right"><span class="px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 text-xs font-semibold mono">${f.marginPct}%</span></td>
+                    <td class="px-3 py-3 text-right mono text-blue-400">${fmt(f.profitPerHour)}</td>
+                    <td class="px-3 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profitPotential)}</td>
+                    <td class="px-3 py-3 text-center">${f.isManipulated ? '<span class="text-red-400 text-xs">⚠️</span>' : '<span class="text-green-400 text-xs">✅</span>'}</td>
                 </tr>`).join('');
         }
 
@@ -473,8 +474,8 @@
             
             document.getElementById('craft-table-body').innerHTML = filtered.slice(0, 50).map((f, i) => `
                 <tr class="table-row fade-in">
-                    <td class="px-4 py-3 text-zinc-600 mono text-xs">${i+1}</td>
-                    <td class="px-4 py-3 text-emerald-300 font-medium">
+                    <td class="px-3 py-3 text-zinc-600 mono text-xs">${i+1}</td>
+                    <td class="px-3 py-3 text-emerald-300 font-medium">
                         <div class="flex flex-col">
                             <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
                                 ${f.name}
@@ -488,13 +489,16 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmtPrice(f.sellPrice)}</td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmtPrice(f.craftCost)}</td>
-                    <td class="px-4 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profit)}</td>
-                    <td class="px-4 py-3 text-right"><span class="px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 text-xs font-semibold mono">${f.marginPct}%</span></td>
-                    <td class="px-4 py-3 text-right mono text-blue-400">${fmt(f.volume)}</td>
-                    <td class="px-4 py-3 text-center">
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmtPrice(f.sellPrice)}</td>
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmtPrice(f.craftCost)}</td>
+                    <td class="px-3 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profit)}</td>
+                    <td class="px-3 py-3 text-right"><span class="px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 text-xs font-semibold mono">${f.marginPct}%</span></td>
+                    <td class="px-3 py-3 text-right mono text-blue-400">${fmt(f.volume)}</td>
+                    <td class="px-3 py-3 text-center">
                         <span class="px-2 py-1 rounded-lg bg-zinc-800/50 text-zinc-400 text-xs tooltip" data-tooltip="${f.ingredients ? f.ingredients.map(ing => `${ing.count}x ${ing.name}`).join('\n') : ''}">${f.ingredients ? f.ingredients.length : 0} items</span>
+                    </td>
+                    <td class="px-3 py-3 text-center">
+                        <a href="https://sky.coflnet.com/api/craft/${f.productId}/instructions" target="_blank" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs hover:bg-emerald-500/30 transition-colors">View</a>
                     </td>
                 </tr>`).join('');
         }
@@ -508,20 +512,20 @@
             
             document.getElementById('kat-table-body').innerHTML = filtered.slice(0, 50).map((f, i) => `
                 <tr class="table-row fade-in">
-                    <td class="px-4 py-3 text-zinc-600 mono text-xs">${i+1}</td>
-                    <td class="px-4 py-3 text-emerald-300 font-medium">
+                    <td class="px-3 py-3 text-zinc-600 mono text-xs">${i+1}</td>
+                    <td class="px-3 py-3 text-emerald-300 font-medium">
                         <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
                             ${f.name}
                         </a>
                     </td>
-                    <td class="px-4 py-3 text-center">
+                    <td class="px-3 py-3 text-center">
                         ${getRarityBadge(f.fromRarity)} <span class="text-zinc-500 mx-1">→</span> ${getRarityBadge(f.toRarity)}
                     </td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmt(f.purchaseCost)}</td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmt(f.materialCost)}</td>
-                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmt(f.median)}</td>
-                    <td class="px-4 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profit)}</td>
-                    <td class="px-4 py-3 text-right mono text-blue-400">${fmt(f.volume)}</td>
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmt(f.purchaseCost)}</td>
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmt(f.materialCost)}</td>
+                    <td class="px-3 py-3 text-right mono text-zinc-400">${fmt(f.median)}</td>
+                    <td class="px-3 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profit)}</td>
+                    <td class="px-3 py-3 text-right mono text-blue-400">${fmt(f.volume)}</td>
                 </tr>`).join('');
         }
 
