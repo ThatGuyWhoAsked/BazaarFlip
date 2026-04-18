@@ -384,12 +384,11 @@
         async function showInstructions(productId, btn) {
             const data = await fetchInstructions(productId);
             if (data) {
-                const popup = btn.nextElementSibling;
-                popup.textContent = formatInstructions(data);
-                popup.style.top = '50%';
-                popup.style.left = '50%';
-                popup.style.transform = 'translate(-50%, -50%)';
-                popup.classList.toggle('hidden');
+                const overlay = document.getElementById('instruction-overlay');
+                const content = overlay.querySelector('div');
+                content.textContent = formatInstructions(data);
+                overlay.classList.remove('hidden');
+                overlay.onclick = () => overlay.classList.add('hidden');
             }
         }
 
@@ -625,9 +624,13 @@
                     </td>
                     <td class="px-3 py-3 text-center relative">
                         <button onclick="showInstructions('${f.productId}', this)" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs hover:bg-emerald-500/30 transition-colors">View</button>
-                        <div class="instruction-popup hidden fixed z-50 bg-zinc-800 border border-zinc-600 rounded-lg p-4 text-sm text-zinc-300 whitespace-pre-line" style="min-width: 350px; max-width: 500px; max-height: 400px; overflow-y: auto;"></div>
                     </td>
                 </tr>`).join('');
+
+            document.getElementById('craft-table-body').innerHTML += `
+                <tr id="instruction-overlay" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+                    <div class="bg-zinc-800 border border-zinc-600 rounded-lg p-6 text-base text-zinc-300 whitespace-pre-line max-w-lg max-h-[80vh] overflow-y-auto"></div>
+                </tr>`;
         }
 
         function renderKatTable() {
