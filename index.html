@@ -359,13 +359,13 @@
                         if (match) {
                             tag = match[1];
                             count = match[2];
-                        } else {
-                            tag = part;
-                            count = 1;
-                        }
-                    }
-                    const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ').replace(/§[0-9a-fk-or]/g, '');
-                    items.push(`${count}x ${name}`);
+                         } else {
+                             tag = part;
+                             count = 1;
+                         }
+                     }
+                     const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ');
+                     items.push(`${count}x ${name}`);
                 }
             });
             
@@ -373,19 +373,70 @@
             
             if (instructions.copyCommands) {
                 result += '\n\n--- Buy Commands ---\n';
-                Object.entries(instructions.copyCommands).forEach(([tag, cmd]) => {
-                    const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ').replace(/§[0-9a-fk-or]/g, '');
-                    result += `${name}: ${cmd}\n`;
-                });
+                 Object.entries(instructions.copyCommands).forEach(([tag, cmd]) => {
+                     const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ');
+                     result += `${name}: ${cmd}\n`;
+                 });
+             }
+             
+            return convertMinecraftCodes(result);
+        }
+
+        function convertMinecraftCodes(text) {
+            const colorMap = {
+                '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+                '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+                '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+                'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF'
+            };
+            const formatMap = {
+                'l': 'bold', 'o': 'italic', 'n': 'underline', 'm': 'line-through'
+            };
+
+            let result = '';
+            let stack = [];
+            let i = 0;
+
+            while (i < text.length) {
+                if (text[i] === '§' && i + 1 < text.length) {
+                    const code = text[i + 1].toLowerCase();
+                    i += 2;
+
+                    if (code === 'r') {
+                        while (stack.length) {
+                            const tag = stack.pop();
+                            result += `</${tag}>`;
+                        }
+                        continue;
+                    }
+
+                    if (colorMap[code]) {
+                        while (stack.length) stack.pop();
+                        result += `<span style="color: ${colorMap[code]}">`;
+                        stack.push('span');
+                    } else if (formatMap[code]) {
+                        const tag = formatMap[code];
+                        result += `<${tag}>`;
+                        stack.push(tag);
+                    }
+                } else {
+                    result += text[i];
+                    i++;
+                }
             }
-            
+
+            while (stack.length) {
+                const tag = stack.pop();
+                result += `</${tag}>`;
+            }
+
             return result;
         }
 
         async function showInstructions(productId, btn) {
             const data = await fetchInstructions(productId);
             if (data) {
-                document.getElementById('craft-popup-content').textContent = formatInstructions(data);
+                document.getElementById('craft-popup-content').innerHTML = formatInstructions(data);
                 document.getElementById('craft-popup').classList.remove('hidden');
             }
         }
