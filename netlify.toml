@@ -9,6 +9,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/calendar"
+  to = "/.netlify/functions/api?calendar=true"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

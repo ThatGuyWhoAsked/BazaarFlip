@@ -42,9 +42,31 @@
         }
         
         .bg-gradient {
-            background: radial-gradient(ellipse at 20% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.02) 0%, transparent 50%),
-                        radial-gradient(ellipse at 50% 80%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
+            background: #0a0a0c;
+            position: relative;
+        }
+        
+        .bg-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 400px;
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .bg-gradient::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.04) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 40%);
+            pointer-events: none;
         }
         
         .table-row:hover { background: rgba(16, 185, 129, 0.04); }
@@ -89,93 +111,98 @@
     </style>
 </head>
 <body class="bg-gradient min-h-screen">
-    <div class="max-w-6xl mx-auto px-4 py-8 md:px-6 md:py-10">
+    <div class="max-w-6xl mx-auto px-4 py-8 md:px-6 md:py-10 relative z-10">
         <!-- Header -->
-        <header class="mb-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-3">
-                        <h1 class="text-3xl md:text-4xl font-bold">
-                            Bazaar <span class="text-emerald-400">Flipper</span>
-                        </h1>
-                        <span class="px-2 py-0.5 text-xs font-medium bg-emerald-500/20 text-emerald-400 rounded-full">v2.1</span>
+        <header class="mb-8 relative">
+            <!-- Background decoration -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-500/5 rounded-full blur-2xl"></div>
+            </div>
+            
+            <!-- Main hero bar -->
+            <div class="glass-strong rounded-2xl p-5 glow relative overflow-hidden">
+                <!-- Subtle gradient overlay -->
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-blue-500/5"></div>
+                
+                <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                    <!-- Left: Logo & Title -->
+                    <div class="flex items-center gap-5">
+                        <div class="relative">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-zinc-900 status-live"></div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+                                    Bazaar <span class="text-emerald-400">Flipper</span>
+                                </h1>
+                                <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30">v2.1</span>
+                            </div>
+                            <div class="flex items-center gap-3 mt-1.5">
+                                <span class="flex items-center gap-1.5 text-xs text-zinc-500">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                    Coflnet Powered
+                                </span>
+                                <span class="text-zinc-700">•</span>
+                                <span class="text-xs text-zinc-500">1.25% tax</span>
+                                <span class="text-zinc-700">•</span>
+                                <span class="text-xs text-zinc-400 font-mono">Auto-refresh 60s</span>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-zinc-500 text-sm mt-2 flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        Coflnet Powered Arbitrage Tool
-                        <span class="text-zinc-600">•</span>
-                        1.25% tax accounted
-                    </p>
+                    
+                    <!-- Right: Status & Last Updated -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
+                            <span id="dot" class="w-2 h-2 rounded-full bg-emerald-500 status-live"></span>
+                            <span id="status-text" class="text-sm font-semibold text-emerald-400">Live</span>
+                        </div>
+                        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800/30 border border-zinc-700/30">
+                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span id="last-updated" class="text-xs mono text-zinc-400">--:--:--</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <!-- Profile Section -->
-                    <div class="glass px-4 py-2 rounded-full flex items-center gap-3">
+                
+                <!-- Profile inputs row -->
+                <div class="relative mt-5 pt-5 border-t border-white/5">
+                    <div class="flex flex-wrap items-center gap-4">
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">User:</span>
+                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">User</span>
                             <input type="text" id="username" placeholder="Username" value="EliteRedstoner"
                                    onchange="fetchFlips()" onkeyup="if(event.key==='Enter') fetchFlips()"
-                                   class="w-28 px-2 py-1 bg-zinc-800/50 border border-zinc-700 rounded text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                                   class="w-32 px-3 py-2 bg-zinc-800/60 border border-zinc-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 focus:bg-zinc-800/80 transition-all">
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Profile:</span>
+                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Profile</span>
                             <input type="text" id="profile" placeholder="Lime" value="Lime"
                                    onchange="fetchFlips()" onkeyup="if(event.key==='Enter') fetchFlips()"
-                                   class="w-20 px-2 py-1 bg-zinc-800/50 border border-zinc-700 rounded text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                                   class="w-24 px-3 py-2 bg-zinc-800/60 border border-zinc-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 focus:bg-zinc-800/80 transition-all">
                         </div>
-                        <div class="flex items-center gap-2 border-l border-zinc-700 pl-3">
-                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Purse:</span>
+                        <div class="flex items-center gap-2 border-l border-zinc-700/50 pl-4">
+                            <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Purse</span>
                             <input type="number" id="purse" placeholder="Coins" value="1000000000"
-                                   class="w-28 px-2 py-1 bg-zinc-800/50 border border-zinc-700 rounded text-xs text-emerald-400 font-bold focus:outline-none focus:border-emerald-500 transition-colors">
+                                   class="w-36 px-3 py-2 bg-zinc-800/60 border border-zinc-700 rounded-lg text-sm text-emerald-400 font-bold mono focus:outline-none focus:border-emerald-500 focus:bg-zinc-800/80 transition-all">
                         </div>
-                        <button onclick="saveProfile()" class="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold rounded transition-colors">
+                        <button onclick="saveProfile()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-zinc-900 text-xs font-bold rounded-lg transition-all hover:shadow-lg hover:shadow-emerald-500/20">
                             Save
                         </button>
-                    </div>
-                    <div id="status" class="flex items-center gap-2 px-4 py-2 rounded-full glass text-xs">
-                        <span id="dot" class="w-2 h-2 rounded-full bg-emerald-500 status-live"></span>
-                        <span id="status-text" class="font-medium">Live</span>
-                    </div>
-                    <div class="glass px-4 py-2 rounded-full text-xs text-zinc-400">
-                        <span id="last-updated">--:--:--</span>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-            <div class="glass p-4 rounded-xl glow-hover transition-all duration-300">
-                <div class="flex items-center gap-2 mb-1">
-                    <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
-                    <p class="text-zinc-500 text-xs font-medium">Flips Found</p>
-                </div>
-                <p id="total-items" class="text-2xl font-bold mono text-white">--</p>
-            </div>
-            
-            <div class="glass p-4 rounded-xl glow-hover transition-all duration-300 border-l-2 border-emerald-500">
-                <div class="flex items-center gap-2 mb-1">
-                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                    <p class="text-zinc-500 text-xs font-medium">Best Margin</p>
-                </div>
-                <p id="best-margin" class="text-2xl font-bold mono text-emerald-400">--</p>
-            </div>
-            
-            <div class="glass p-4 rounded-xl glow-hover transition-all duration-300">
-                <div class="flex items-center gap-2 mb-1">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    <p class="text-zinc-500 text-xs font-medium">Potential</p>
-                </div>
-                <p id="flips-count" class="text-2xl font-bold mono text-white">--</p>
-            </div>
-            
-            <div class="glass p-4 rounded-xl glow-hover transition-all duration-300">
-                <div class="flex items-center gap-2 mb-1">
-                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <p class="text-zinc-500 text-xs font-medium">Top Profit</p>
-                </div>
-                <p id="top-profit" class="text-2xl font-bold mono text-purple-400">--</p>
-            </div>
-        </div>
+        
 
         <!-- Tab Navigation -->
         <div class="flex gap-2 mb-6">
@@ -187,6 +214,9 @@
             </button>
             <button id="tab-kat" onclick="switchTab('kat')" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-zinc-800/50 text-zinc-400 border border-zinc-700 hover:bg-zinc-700/50">
                 🐾 KAT Flips
+            </button>
+            <button id="tab-calendar" onclick="switchTab('calendar')" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-zinc-800/50 text-zinc-400 border border-zinc-700 hover:bg-zinc-700/50">
+                📅 Calendar
             </button>
         </div>
 
@@ -317,13 +347,32 @@
             </div>
         </div>
 
+        <!-- Calendar Section -->
+        <div id="calendar-section" class="hidden">
+            <div class="glass p-4 rounded-xl mb-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-zinc-400 font-mono" id="calendar-date">Loading...</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-zinc-500">Next day:</span>
+                        <span class="text-xs text-emerald-400 font-mono" id="calendar-next-day">--</span>
+                    </div>
+                    <button onclick="fetchCalendar()" class="ml-auto px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 text-sm font-medium rounded-lg transition-colors border border-zinc-700">Refresh</button>
+                </div>
+            </div>
+            <div id="calendar-events" class="grid gap-4">
+                <div class="glass rounded-xl p-8 text-center text-zinc-500">Loading events...</div>
+            </div>
+        </div>
+
         <footer class="mt-8 text-center text-zinc-600 text-xs">
             <p>Auto-refreshes every 60s • Data and Prices provided by <a href="https://sky.coflnet.com/data" target="_blank" class="text-emerald-500 hover:underline font-bold">SkyCofl</a></p>
         </footer>
     </div>
 
     <script>
-        let currentFlips = [], currentCraftFlips = [], currentKatFlips = [], refreshInterval = null, activeTab = 'bazaar';
+        let currentFlips = [], currentCraftFlips = [], currentKatFlips = [], currentCalendar = null, refreshInterval = null, activeTab = 'bazaar';
         let bazaarSort = { column: 'profitPotential', direction: 'desc' }, craftSort = { column: 'profit', direction: 'desc' }, katSort = { column: 'profit', direction: 'desc' };
         
         const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
@@ -349,17 +398,93 @@
             const items = [];
             ['A1','A2','A3','B1','B2','B3','C1','C2','C3'].forEach(slot => {
                 if (r[slot]) {
-                    const [tag, count] = r[slot].split(':');
-                    items.push(`${count}x ${tag.replace(/_/g, ' ').replace('ENCHANTED ', 'E. ')}`);
+                    const part = r[slot];
+                    let tag, count;
+                    if (part.includes(':')) {
+                        [tag, count] = part.split(':');
+                    } else {
+                        const match = part.match(/^(.+?)\s+(\d+)$/);
+                        if (match) {
+                            tag = match[1];
+                            count = match[2];
+                        } else {
+                            tag = part;
+                            count = 1;
+                        }
+                    }
+                    const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ');
+                    items.push(`${count}x ${name}`);
                 }
             });
-            return items.join('\n') || "Empty recipe";
+            
+            let result = items.join('\n') || "Empty recipe";
+            
+            if (instructions.copyCommands) {
+                result += '\n\n--- Buy Commands ---\n';
+                Object.entries(instructions.copyCommands).forEach(([tag, cmd]) => {
+                    const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ');
+                    result += `${name}: ${cmd}\n`;
+                });
+            }
+            
+            return convertMinecraftCodes(result);
+        }
+
+        function convertMinecraftCodes(text) {
+            const colorMap = {
+                '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+                '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+                '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+                'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF'
+            };
+            const formatMap = {
+                'l': 'bold', 'o': 'italic', 'n': 'underline', 'm': 'line-through'
+            };
+
+            let result = '';
+            let stack = [];
+            let i = 0;
+
+            while (i < text.length) {
+                if (text[i] === '§' && i + 1 < text.length) {
+                    const code = text[i + 1].toLowerCase();
+                    i += 2;
+
+                    if (code === 'r') {
+                        while (stack.length) {
+                            const tag = stack.pop();
+                            result += `</${tag}>`;
+                        }
+                        continue;
+                    }
+
+                    if (colorMap[code]) {
+                        while (stack.length) stack.pop();
+                        result += `<span style="color: ${colorMap[code]}">`;
+                        stack.push('span');
+                    } else if (formatMap[code]) {
+                        const tag = formatMap[code];
+                        result += `<${tag}>`;
+                        stack.push(tag);
+                    }
+                } else {
+                    result += text[i];
+                    i++;
+                }
+            }
+
+            while (stack.length) {
+                const tag = stack.pop();
+                result += `</${tag}>`;
+            }
+
+            return result;
         }
 
         async function showInstructions(productId, btn) {
             const data = await fetchInstructions(productId);
             if (data) {
-                btn.nextElementSibling.textContent = formatInstructions(data);
+                btn.nextElementSibling.innerHTML = formatInstructions(data);
                 btn.nextElementSibling.classList.toggle('hidden');
             }
         }
@@ -481,15 +606,6 @@
                     volume: Math.floor(item.volume || 0)
                 }));
                 
-                document.getElementById('total-items').textContent = currentFlips.length;
-                document.getElementById('flips-count').textContent = currentCraftFlips.length;
-                
-                if (currentFlips.length > 0) {
-                    const best = [...currentFlips].sort((a,b) => b.marginPct - a.marginPct)[0];
-                    document.getElementById('best-margin').textContent = best.marginPct.toFixed(1) + '%';
-                    document.getElementById('top-profit').textContent = fmt(currentFlips[0].profitPotential);
-                }
-                
                 document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
                 renderTable(); renderCraftTable(); renderKatTable();
             } catch (e) {
@@ -549,7 +665,7 @@
                     <td class="px-3 py-3 text-zinc-600 mono text-xs">${i+1}</td>
                     <td class="px-3 py-3 text-emerald-300 font-medium">
                         <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
-                            ${f.name}
+                            ${convertMinecraftCodes(f.name)}
                         </a>
                     </td>
                     <td class="px-3 py-3 text-right mono text-zinc-400">${fmtPrice(f.buyAt)}</td>
@@ -574,8 +690,8 @@
                     <td class="px-3 py-3 text-zinc-600 mono text-xs">${i+1}</td>
                     <td class="px-3 py-3 text-emerald-300 font-medium">
                         <div class="flex flex-col">
-                            <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
-                                ${f.name}
+<a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
+                                ${convertMinecraftCodes(f.name)}
                             </a>
                             <div class="flex flex-wrap gap-1 mt-1">
                                 ${(f.requirements && f.requirements.length > 0) ? f.requirements.map(req => `
@@ -613,7 +729,7 @@
                     <td class="px-3 py-3 text-zinc-600 mono text-xs">${i+1}</td>
                     <td class="px-3 py-3 text-emerald-300 font-medium">
                         <a href="https://sky.coflnet.com/item/${f.productId}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
-                            ${f.name}
+                            ${convertMinecraftCodes(f.name)}
                         </a>
                     </td>
                     <td class="px-3 py-3 text-center">
@@ -632,13 +748,64 @@
             document.getElementById('tab-bazaar').className = t === 'bazaar' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
             document.getElementById('tab-craft').className = t === 'craft' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
             document.getElementById('tab-kat').className = t === 'kat' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
+            document.getElementById('tab-calendar').className = t === 'calendar' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
             document.getElementById('bazaar-section').classList.toggle('hidden', t !== 'bazaar');
             document.getElementById('craft-section').classList.toggle('hidden', t !== 'craft');
             document.getElementById('kat-section').classList.toggle('hidden', t !== 'kat');
+            document.getElementById('calendar-section').classList.toggle('hidden', t !== 'calendar');
+            if (t === 'calendar' && !currentCalendar) fetchCalendar();
             localStorage.setItem('bazaar_activeTab', t);
         }
 
         function refreshData() { fetchFlips(); }
+
+        async function fetchCalendar() {
+            try {
+                const container = document.getElementById('calendar-events');
+                container.innerHTML = '<div class="glass rounded-xl p-8 text-center text-zinc-500">Loading...</div>';
+                const res = await fetch("https://corsproxy.io/?https://qwackapi-production-bb5d.up.railway.app/v1/calendar", {
+                    headers: { "Authorization": "Dumbfuck" }
+                });
+                const json = await res.json();
+                if (json.status === 200 && json.data) {
+                    currentCalendar = json.data;
+                    renderCalendar();
+                } else {
+                    container.innerHTML = '<div class="glass rounded-xl p-8 text-center text-red-400">Failed to load calendar</div>';
+                }
+            } catch (e) {
+                console.error("Calendar fetch error:", e);
+                document.getElementById('calendar-events').innerHTML = '<div class="glass rounded-xl p-8 text-center text-red-400">Error: ' + e.message + '</div>';
+            }
+        }
+
+        function renderCalendar() {
+            if (!currentCalendar || !currentCalendar.events) return;
+            const container = document.getElementById('calendar-events');
+            document.getElementById('calendar-date').textContent = `${currentCalendar.date} (Year ${currentCalendar.year})`;
+            const nextDaySec = Math.floor((currentCalendar.next_day_countdown || 0) / 1000);
+            const hours = Math.floor(nextDaySec / 3600), mins = Math.floor((nextDaySec % 3600) / 60), secs = nextDaySec % 60;
+            document.getElementById('calendar-next-day').textContent = `${hours}h ${mins}m ${secs}s`;
+
+            const eventTypes = Object.entries(currentCalendar.events).filter(([,v]) => v.events?.length > 0);
+            container.innerHTML = eventTypes.map(([key, evt]) => {
+                const nextEvent = evt.events?.[0];
+                const waitSec = nextEvent ? Math.floor((nextEvent.starting_in || 0) / 1000) : null;
+                const timeStr = waitSec !== null ? `${Math.floor(waitSec/3600)}h ${Math.floor((waitSec%3600)/60)}m` : '--';
+                const color = key === 'DARK_AUCTION' ? 'text-red-400 bg-red-500/10 border-red-500/30' :
+                            key === 'BANK_INTEREST' ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30' :
+                            key === 'JERSEY_JOE' ? 'text-blue-400 bg-blue-500/10 border-blue-500/30' :
+                            'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+                return `
+                    <div class="glass rounded-xl p-4 border ${color}">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold ${color.replace('bg-', 'text-').replace('/10 border', '')}">${evt.name}</span>
+                            <span class="text-xs text-zinc-500 mono">in ${timeStr}</span>
+                        </div>
+                        <div class="text-xs text-zinc-400">Next: ${nextEvent ? new Date(nextEvent.start_timestamp).toLocaleTimeString() : 'N/A'}</div>
+                    </div>`;
+            }).join('');
+        }
 
         const debouncedRender = {
             bazaar: debounce(() => renderTable(), 300),
@@ -676,6 +843,7 @@
                 if (e.key === '1') switchTab('bazaar');
                 if (e.key === '2') switchTab('craft');
                 if (e.key === '3') switchTab('kat');
+                if (e.key === '4') switchTab('calendar');
             });
         });
     </script>

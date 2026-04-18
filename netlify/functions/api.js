@@ -4,6 +4,8 @@ const TAX_RATE = 0.0125;
 const COFLNET_BZ_SPREAD_URL = "https://sky.coflnet.com/api/flip/bazaar/spread";
 const COFLNET_CRAFT_URL = "https://sky.coflnet.com/api/craft/profit";
 const COFLNET_KAT_PROFIT_URL = "https://sky.coflnet.com/api/kat/profit";
+const CALENDAR_API_URL = "https://qwackapi-production-bb5d.up.railway.app/v1/calendar";
+const CALENDAR_AUTH = "Dumbfuck";
 
 const katCache = { data: null, timestamp: 0 };
 const KAT_CACHE_DURATION = 3 * 60 * 1000;
@@ -139,6 +141,22 @@ async function fetchKatFlips() {
 exports.handler = async (event) => {
     const player = event.queryStringParameters.player || "";
     const profile = event.queryStringParameters.profile || "";
+    
+    if (event.path === "/calendar" || event.queryStringParameters.calendar === "true") {
+        try {
+            const res = await fetch(CALENDAR_API_URL, {
+                headers: { "Authorization": CALENDAR_AUTH }
+            });
+            const data = await res.json();
+            return {
+                statusCode: 200,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            };
+        } catch (e) {
+            return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
+        }
+    }
     
     console.log(`Fetching flips for ${player} (${profile})`);
     
