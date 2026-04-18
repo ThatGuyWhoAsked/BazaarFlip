@@ -90,7 +90,8 @@
 </head>
 <body class="bg-gradient min-h-screen">
     <div id="craft-popup" class="hidden fixed z-40 bg-zinc-800 border border-zinc-600 rounded-xl p-5 text-zinc-300 whitespace-pre-line shadow-2xl" style="top: 100px; right: 20px; max-width: 400px; max-height: 60vh; overflow-y: auto;">
-        <button onclick="closeCraftModal()" class="absolute top-2 right-2 text-zinc-400 hover:text-white text-xl">&times;</button>
+        <button onclick="closeCraftModal()" class="absolute top-2 right-2 text-zinc-400 hover:text-white text-xl z-10">&times;</button>
+        <div id="craft-popup-content"></div>
     </div>
     <div class="max-w-6xl mx-auto px-4 py-8 md:px-6 md:py-10">
         <!-- Header -->
@@ -384,7 +385,7 @@
         async function showInstructions(productId, btn) {
             const data = await fetchInstructions(productId);
             if (data) {
-                document.getElementById('craft-popup').textContent = formatInstructions(data);
+                document.getElementById('craft-popup-content').textContent = formatInstructions(data);
                 document.getElementById('craft-popup').classList.remove('hidden');
             }
         }
