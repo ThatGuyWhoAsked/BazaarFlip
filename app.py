@@ -73,6 +73,20 @@ def fetch_coflnet_craft_flips(player=None, profile=None):
             craft_cost = item.get("craftCost", 0)
             profit = sell_price - craft_cost
             margin_pct = (profit / craft_cost * 100) if craft_cost > 0 else 0
+            requirements = []
+            if "reqCollection" in item and item["reqCollection"]:
+                requirements.append({
+                    "name": item["reqCollection"].get("name", "Unknown"),
+                    "level": item["reqCollection"].get("level", 0),
+                    "type": "Collection"
+                })
+            if "reqSlayer" in item and item["reqSlayer"]:
+                requirements.append({
+                    "name": item["reqSlayer"].get("name", "Unknown"),
+                    "level": item["reqSlayer"].get("level", 0),
+                    "type": "Slayer"
+                })
+
             normalized_flips.append({
                 "productId": item.get("itemId"),
                 "name": clean_minecraft_text(item.get("itemName", item.get("itemId", "Unknown"))),
@@ -81,6 +95,7 @@ def fetch_coflnet_craft_flips(player=None, profile=None):
                 "profit": round(profit, 2),
                 "marginPct": round(margin_pct, 1),
                 "volume": int(item.get("volume", 0)),
+                "requirements": requirements,
                 "ingredients": [
                     {
                         "name": clean_minecraft_text(ing.get("itemId", "Unknown").replace("_", " ").title()),

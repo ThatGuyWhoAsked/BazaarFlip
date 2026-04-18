@@ -3,6 +3,10 @@ const fetch = require('node-fetch');
 const TAX_RATE = 0.0125;
 const COFLNET_BZ_SPREAD_URL = "https://sky.coflnet.com/api/flip/bazaar/spread";
 const COFLNET_CRAFT_URL = "https://sky.coflnet.com/api/craft/profit";
+const COFLNET_KAT_PROFIT_URL = "https://sky.coflnet.com/api/kat/profit";
+
+const katCache = { data: null, timestamp: 0 };
+const KAT_CACHE_DURATION = 3 * 60 * 1000;
 
 function cleanMinecraftText(text) {
     if (!text) return "";
@@ -61,6 +65,22 @@ async function fetchCraftFlips(player, profile) {
             const profit = sellPrice - craftCost;
             const marginPct = craftCost > 0 ? (profit / craftCost * 100) : 0;
             
+            const requirements = [];
+            if (item.reqCollection) {
+                requirements.push({
+                    name: item.reqCollection.name || "Unknown",
+                    level: item.reqCollection.level || 0,
+                    type: "Collection"
+                });
+            }
+            if (item.reqSlayer) {
+                requirements.push({
+                    name: item.reqSlayer.name || "Unknown",
+                    level: item.reqSlayer.level || 0,
+                    type: "Slayer"
+                });
+            }
+            
             return {
                 productId: item.itemId,
                 name: cleanMinecraftText(item.itemName || item.itemId || "Unknown"),
@@ -69,10 +89,7 @@ async function fetchCraftFlips(player, profile) {
                 profit: Math.round(profit * 100) / 100,
                 marginPct: Math.round(marginPct * 10) / 10,
                 volume: Math.floor(item.volume || 0),
-                requirements: (item.requirements || []).map(req => ({
-                    name: req.name || "Unknown",
-                    level: req.level || 0
-                })),
+                requirements: requirements,
                 ingredients: (item.ingredients || []).map(ing => ({
                     name: cleanMinecraftText((ing.itemId || "Unknown").replace(/_/g, ' ')),
                     count: ing.count || 0
@@ -85,26 +102,64 @@ async function fetchCraftFlips(player, profile) {
     }
 }
 
+async function fetchKatFlips() {
+    try {
+        const now = Date.now();
+        if (katCache.data && (now - katCache.timestamp) < KAT_CACHE_DURATION) {
+            return katCache.data;
+        }
+
+        const res = await fetch(COFLNET_KAT_PROFIT_URL, { timeout: 10000 });
+        const data = await res.json();
+
+        const katFlips = data.map(item => ({
+            name: item.name || item.coreData?.name || "Unknown Pet",
+            fromRarity: item.coreData?.baseRarity || item.fromRarity || "UNKNOWN",
+            toRarity: item.targetRarity || "UNKNOWN",
+            purchaseCost: Math.round(item.purchaseCost || 0),
+            materialCost: Math.round(item.materialCost || 0),
+            median: Math.round(item.median || 0),
+            profit: Math.round(item.profit || 0),
+            volume: Math.floor(item.volume || 0),
+            hours: item.hours || 0,
+            materials: item.materials || item.coreData?.materials || {}
+        }));
+
+        katCache.data = katFlips;
+        katCache.timestamp = now;
+
+        return katFlips;
+    } catch (e) {
+        console.error("KAT API Error:", e);
+        return katCache.data || [];
+    }
+}
+
 exports.handler = async (event) => {
     const player = event.queryStringParameters.player || "";
     const profile = event.queryStringParameters.profile || "";
     
     console.log(`Fetching flips for ${player} (${profile})`);
     
-    const [bazaarFlips, craftFlips] = await Promise.all([
+    const [bazaarFlips, craftFlips, katFlips] = await Promise.all([
         fetchBazaarFlips(),
-        fetchCraftFlips(player, profile)
+        fetchCraftFlips(player, profile),
+        fetchKatFlips()
     ]);
 
     return {
         statusCode: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=55"
+        },
         body: JSON.stringify({
             success: true,
             updated: new Date().toISOString(),
             totalProducts: bazaarFlips.length,
             flips: bazaarFlips,
-            craftFlips: craftFlips
+            craftFlips: craftFlips,
+            katFlips: katFlips
         })
     };
 };

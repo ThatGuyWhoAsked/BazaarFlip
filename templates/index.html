@@ -185,6 +185,9 @@
             <button id="tab-craft" onclick="switchTab('craft')" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-zinc-800/50 text-zinc-400 border border-zinc-700 hover:bg-zinc-700/50">
                 ⚒️ Craft Flipping
             </button>
+            <button id="tab-kat" onclick="switchTab('kat')" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-zinc-800/50 text-zinc-400 border border-zinc-700 hover:bg-zinc-700/50">
+                🐾 KAT Flips
+            </button>
         </div>
 
         <!-- Bazaar Section -->
@@ -277,14 +280,66 @@
             </div>
         </div>
 
+        <!-- KAT Section -->
+        <div id="kat-section" class="hidden">
+            <div class="glass p-4 rounded-xl mb-6">
+                <div class="flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-zinc-500 font-medium">Search:</label>
+                        <input type="text" id="kat-search" placeholder="Pet name..." class="w-40 px-3 py-1.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-zinc-500 font-medium">Min Profit:</label>
+                        <input type="number" id="kat-filter-profit" value="500000" min="0" step="100000" class="w-28 px-3 py-1.5 bg-zinc-800/50 border border-zinc-700 rounded-lg text-sm mono text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                    </div>
+                    <button onclick="refreshData()" class="ml-auto px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 text-sm font-medium rounded-lg transition-colors border border-zinc-700">Refresh</button>
+                </div>
+            </div>
+            <div class="glass rounded-2xl overflow-hidden glow">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-white/5 text-zinc-400 text-xs">
+                            <tr>
+                                <th class="px-4 py-4 text-left font-semibold">#</th>
+                                <th class="px-4 py-4 text-left font-semibold cursor-pointer hover:text-white" onclick="setKatSort('name')">Pet</th>
+                                <th class="px-4 py-4 text-center font-semibold cursor-pointer hover:text-white" onclick="setKatSort('fromRarity')">From → To</th>
+                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setKatSort('purchaseCost')">Purchase Cost</th>
+                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setKatSort('materialCost')">Material Cost</th>
+                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setKatSort('median')">Median Sell</th>
+                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setKatSort('profit')">Profit</th>
+                                <th class="px-4 py-4 text-right font-semibold cursor-pointer hover:text-white" onclick="setKatSort('volume')">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kat-table-body" class="divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <footer class="mt-8 text-center text-zinc-600 text-xs">
             <p>Auto-refreshes every 60s • Data and Prices provided by <a href="https://sky.coflnet.com/data" target="_blank" class="text-emerald-500 hover:underline font-bold">SkyCofl</a></p>
         </footer>
     </div>
 
     <script>
-        let currentFlips = [], currentCraftFlips = [], refreshInterval = null, activeTab = 'bazaar';
-        let bazaarSort = { column: 'profitPotential', direction: 'desc' }, craftSort = { column: 'profit', direction: 'desc' };
+        let currentFlips = [], currentCraftFlips = [], currentKatFlips = [], refreshInterval = null, activeTab = 'bazaar';
+        let bazaarSort = { column: 'profitPotential', direction: 'desc' }, craftSort = { column: 'profit', direction: 'desc' }, katSort = { column: 'profit', direction: 'desc' };
+        
+        const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+        function saveFilters() {
+            localStorage.setItem('bazaar_filter-margin', document.getElementById('filter-margin').value);
+            localStorage.setItem('bazaar_filter-volume', document.getElementById('filter-volume').value);
+            localStorage.setItem('bazaar_filter-manipulated', document.getElementById('filter-manipulated').value);
+            localStorage.setItem('bazaar_kat-filter-profit', document.getElementById('kat-filter-profit').value);
+        }
+
+        function loadFilters() {
+            document.getElementById('filter-margin').value = localStorage.getItem('bazaar_filter-margin') || '1.0';
+            document.getElementById('filter-volume').value = localStorage.getItem('bazaar_filter-volume') || '100';
+            document.getElementById('filter-manipulated').value = localStorage.getItem('bazaar_filter-manipulated') || 'safe';
+            document.getElementById('kat-filter-profit').value = localStorage.getItem('bazaar_kat-filter-profit') || '500000';
+        }
 
         function fmt(n) {
             if (n === undefined || n === null) return "--";
@@ -327,6 +382,7 @@
                 
                 currentFlips = data.flips || [];
                 currentCraftFlips = data.craftFlips || [];
+                currentKatFlips = data.katFlips || [];
                 document.getElementById('total-items').textContent = currentFlips.length;
                 document.getElementById('flips-count').textContent = currentCraftFlips.length;
                 
@@ -337,7 +393,7 @@
                 }
                 
                 document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
-                renderTable(); renderCraftTable();
+                renderTable(); renderCraftTable(); renderKatTable();
             } catch (e) {
                 console.error(e);
                 document.getElementById('status-text').textContent = 'Error';
@@ -354,6 +410,27 @@
             if (craftSort.column === col) craftSort.direction = craftSort.direction === 'asc' ? 'desc' : 'asc';
             else { craftSort.column = col; craftSort.direction = 'desc'; }
             renderCraftTable();
+        }
+
+        function setKatSort(col) {
+            if (katSort.column === col) katSort.direction = katSort.direction === 'asc' ? 'desc' : 'asc';
+            else { katSort.column = col; katSort.direction = 'desc'; }
+            renderKatTable();
+        }
+
+        const rarityColors = {
+            COMMON: 'text-gray-400 bg-gray-500/20 border-gray-500/30',
+            UNCOMMON: 'text-green-400 bg-green-500/20 border-green-500/30',
+            RARE: 'text-blue-400 bg-blue-500/20 border-blue-500/30',
+            EPIC: 'text-purple-400 bg-purple-500/20 border-purple-500/30',
+            LEGENDARY: 'text-orange-400 bg-orange-500/20 border-orange-500/30',
+            MYTHIC: 'text-pink-400 bg-pink-500/20 border-pink-500/30',
+            DIVINE: 'text-cyan-400 bg-cyan-500/20 border-cyan-500/30'
+        };
+
+        function getRarityBadge(rarity) {
+            const color = rarityColors[rarity?.toUpperCase()] || 'text-zinc-400 bg-zinc-500/20 border-zinc-500/30';
+            return `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${color}">${rarity || '?'}</span>`;
         }
 
         function renderTable() {
@@ -422,23 +499,82 @@
                 </tr>`).join('');
         }
 
+        function renderKatTable() {
+            const minProfit = parseFloat(document.getElementById('kat-filter-profit').value) || 0;
+            const search = document.getElementById('kat-search').value.toLowerCase();
+
+            let filtered = currentKatFlips.filter(f => f.profit >= minProfit && f.name.toLowerCase().includes(search));
+            filtered.sort((a,b) => (a[katSort.column] > b[katSort.column] ? 1 : -1) * (katSort.direction === 'asc' ? 1 : -1));
+            
+            document.getElementById('kat-table-body').innerHTML = filtered.slice(0, 50).map((f, i) => `
+                <tr class="table-row fade-in">
+                    <td class="px-4 py-3 text-zinc-600 mono text-xs">${i+1}</td>
+                    <td class="px-4 py-3 text-emerald-300 font-medium">
+                        <a href="https://sky.coflnet.com/pet/${f.name.toLowerCase().replace(/ /g, '_')}" target="_blank" class="hover:underline hover:text-emerald-100 transition-colors">
+                            ${f.name}
+                        </a>
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        ${getRarityBadge(f.fromRarity)} <span class="text-zinc-500 mx-1">→</span> ${getRarityBadge(f.toRarity)}
+                    </td>
+                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmt(f.purchaseCost)}</td>
+                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmt(f.materialCost)}</td>
+                    <td class="px-4 py-3 text-right mono text-zinc-400">${fmt(f.median)}</td>
+                    <td class="px-4 py-3 text-right mono text-emerald-400 font-bold">${fmt(f.profit)}</td>
+                    <td class="px-4 py-3 text-right mono text-blue-400">${fmt(f.volume)}</td>
+                </tr>`).join('');
+        }
+
         function switchTab(t) {
             activeTab = t;
             document.getElementById('tab-bazaar').className = t === 'bazaar' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
             document.getElementById('tab-craft').className = t === 'craft' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
+            document.getElementById('tab-kat').className = t === 'kat' ? 'px-5 py-2.5 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'px-5 py-2.5 rounded-xl text-sm font-medium bg-zinc-800/50 text-zinc-400 border border-zinc-700';
             document.getElementById('bazaar-section').classList.toggle('hidden', t !== 'bazaar');
             document.getElementById('craft-section').classList.toggle('hidden', t !== 'craft');
+            document.getElementById('kat-section').classList.toggle('hidden', t !== 'kat');
+            localStorage.setItem('bazaar_activeTab', t);
         }
 
         function refreshData() { fetchFlips(); }
 
+        const debouncedRender = {
+            bazaar: debounce(() => renderTable(), 300),
+            craft: debounce(() => renderCraftTable(), 300),
+            kat: debounce(() => renderKatTable(), 300)
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            loadProfile(); fetchFlips();
+            loadProfile();
+            loadFilters();
+            
+            const savedTab = localStorage.getItem('bazaar_activeTab') || 'bazaar';
+            switchTab(savedTab);
+            
+            fetchFlips();
             setInterval(fetchFlips, 60000);
+            
             ['bazaar-search', 'filter-margin', 'filter-volume', 'purse'].forEach(id => document.getElementById(id).addEventListener('input', () => {
-                renderTable(); renderCraftTable();
+                debouncedRender.bazaar();
             }));
-            ['craft-search', 'craft-filter-profit'].forEach(id => document.getElementById(id).addEventListener('input', renderCraftTable));
+            ['craft-search', 'craft-filter-profit'].forEach(id => document.getElementById(id).addEventListener('input', debouncedRender.craft));
+            ['kat-search', 'kat-filter-profit'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+                saveFilters();
+                debouncedRender.kat();
+            }));
+            
+            ['filter-margin', 'filter-volume', 'filter-manipulated', 'kat-filter-profit'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', saveFilters);
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                if (e.key.toLowerCase() === 'r') { refreshData(); showNotification('Refreshing...'); }
+                if (e.key === '1') switchTab('bazaar');
+                if (e.key === '2') switchTab('craft');
+                if (e.key === '3') switchTab('kat');
+            });
         });
     </script>
 </body>

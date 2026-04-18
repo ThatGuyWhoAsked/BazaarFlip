@@ -5,3 +5,6 @@ __pycache__/
 server.log
 nohup.out
 .env
+
+# Local Netlify folder
+.netlify
