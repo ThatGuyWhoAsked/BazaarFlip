@@ -328,6 +328,42 @@
         
         const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
+        const instructionsCache = {};
+
+        async function fetchInstructions(productId) {
+            if (instructionsCache[productId]) return instructionsCache[productId];
+            try {
+                const res = await fetch(`https://sky.coflnet.com/api/craft/${productId}/instructions`);
+                const data = await res.json();
+                instructionsCache[productId] = data;
+                return data;
+            } catch (e) {
+                console.error("Failed to fetch instructions:", e);
+                return null;
+            }
+        }
+
+        function formatInstructions(instructions) {
+            if (!instructions || !instructions.recipe) return "No recipe";
+            const r = instructions.recipe;
+            const items = [];
+            ['A1','A2','A3','B1','B2','B3','C1','C2','C3'].forEach(slot => {
+                if (r[slot]) {
+                    const [tag, count] = r[slot].split(':');
+                    items.push(`${count}x ${tag.replace(/_/g, ' ').replace('ENCHANTED ', 'E. ')}`);
+                }
+            });
+            return items.join('\n') || "Empty recipe";
+        }
+
+        async function showInstructions(productId, btn) {
+            const data = await fetchInstructions(productId);
+            if (data) {
+                btn.nextElementSibling.textContent = formatInstructions(data);
+                btn.nextElementSibling.classList.toggle('hidden');
+            }
+        }
+
         function saveFilters() {
             localStorage.setItem('bazaar_filter-margin', document.getElementById('filter-margin').value);
             localStorage.setItem('bazaar_filter-volume', document.getElementById('filter-volume').value);
@@ -497,8 +533,9 @@
                     <td class="px-3 py-3 text-center">
                         <span class="px-2 py-1 rounded-lg bg-zinc-800/50 text-zinc-400 text-xs tooltip" data-tooltip="${f.ingredients ? f.ingredients.map(ing => `${ing.count}x ${ing.name}`).join('\n') : ''}">${f.ingredients ? f.ingredients.length : 0} items</span>
                     </td>
-                    <td class="px-3 py-3 text-center">
-                        <a href="https://sky.coflnet.com/api/craft/${f.productId}/instructions" target="_blank" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs hover:bg-emerald-500/30 transition-colors">View</a>
+                    <td class="px-3 py-3 text-center relative">
+                        <button onclick="showInstructions('${f.productId}', this)" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs hover:bg-emerald-500/30 transition-colors">View</button>
+                        <div class="instruction-popup hidden absolute z-50 bg-zinc-800 border border-zinc-600 rounded-lg p-3 text-xs text-zinc-300 whitespace-pre-line mt-1" style="min-width: 200px; top: 100%;"></div>
                     </td>
                 </tr>`).join('');
         }
