@@ -349,18 +349,47 @@
             const items = [];
             ['A1','A2','A3','B1','B2','B3','C1','C2','C3'].forEach(slot => {
                 if (r[slot]) {
-                    const [tag, count] = r[slot].split(':');
-                    items.push(`${count}x ${tag.replace(/_/g, ' ').replace('ENCHANTED ', 'E. ')}`);
+                    const part = r[slot];
+                    let tag, count;
+                    if (part.includes(':')) {
+                        [tag, count] = part.split(':');
+                    } else {
+                        const match = part.match(/^(.+?)\s+(\d+)$/);
+                        if (match) {
+                            tag = match[1];
+                            count = match[2];
+                        } else {
+                            tag = part;
+                            count = 1;
+                        }
+                    }
+                    const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ').replace(/§[0-9a-fk-or]/g, '');
+                    items.push(`${count}x ${name}`);
                 }
             });
-            return items.join('\n') || "Empty recipe";
+            
+            let result = items.join('\n') || "Empty recipe";
+            
+            if (instructions.copyCommands) {
+                result += '\n\n--- Buy Commands ---\n';
+                Object.entries(instructions.copyCommands).forEach(([tag, cmd]) => {
+                    const name = tag.replace(/_/g, ' ').replace(/ENCHANTED\s+/gi, 'E. ').replace(/§[0-9a-fk-or]/g, '');
+                    result += `${name}: ${cmd}\n`;
+                });
+            }
+            
+            return result;
         }
 
         async function showInstructions(productId, btn) {
             const data = await fetchInstructions(productId);
             if (data) {
-                btn.nextElementSibling.textContent = formatInstructions(data);
-                btn.nextElementSibling.classList.toggle('hidden');
+                const popup = btn.nextElementSibling;
+                popup.textContent = formatInstructions(data);
+                popup.style.top = '50%';
+                popup.style.left = '50%';
+                popup.style.transform = 'translate(-50%, -50%)';
+                popup.classList.toggle('hidden');
             }
         }
 
@@ -596,7 +625,7 @@
                     </td>
                     <td class="px-3 py-3 text-center relative">
                         <button onclick="showInstructions('${f.productId}', this)" class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs hover:bg-emerald-500/30 transition-colors">View</button>
-                        <div class="instruction-popup hidden absolute z-50 bg-zinc-800 border border-zinc-600 rounded-lg p-4 text-sm text-zinc-300 whitespace-pre-line mt-1" style="min-width: 320px; max-width: 450px; max-height: 350px; overflow-y: auto; top: 100%; left: 50%; transform: translateX(-50%);"></div>
+                        <div class="instruction-popup hidden fixed z-50 bg-zinc-800 border border-zinc-600 rounded-lg p-4 text-sm text-zinc-300 whitespace-pre-line" style="min-width: 350px; max-width: 500px; max-height: 400px; overflow-y: auto;"></div>
                     </td>
                 </tr>`).join('');
         }
